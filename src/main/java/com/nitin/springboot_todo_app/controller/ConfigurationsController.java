@@ -11,13 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,17 +56,19 @@ public class ConfigurationsController {
 
 
     @PutMapping("")
-    public Configurations upsertConfig(@Valid @RequestBody Configurations configurations){
+    public Configurations createConfig(@Valid @RequestBody Configurations configurations){
 
-        long count = configurationsRepository
+        Optional<Configurations> configurations1 = configurationsRepository
                 .findAll()
                 .stream()
                 .filter(el -> el.getConfig_key().toLowerCase().equals(configurations.getConfig_key()))
-                .count();
+                .findFirst();
 
-     if(count>0){
+     if(configurations1.isPresent()){
          throw new RuntimeException("Config key already exists");
      }
+     configurations.setLast_updated_by("Nitin m");
+     configurations.setLastUpdatedOn(LocalDateTime.now());
         return configurationsRepository.save(configurations);
     }
 
@@ -93,6 +92,8 @@ public class ConfigurationsController {
         if (optionalConfigurations.isPresent()){
             Configurations configurations = optionalConfigurations.get();
             configurations.setArchived(archive);
+            configurations.setLastUpdatedOn(LocalDateTime.now());
+            configurations.setLast_updated_by("Nitin M");
             configurationsRepository.save(configurations);
             logger.info("Config updated: {}", Json.pretty(configurations));
             String status = archive ? "archived" : "unarchived";

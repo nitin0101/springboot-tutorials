@@ -1,39 +1,54 @@
 package com.nitin.springboot_todo_app.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Configurations {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 36)
+    private String id = UUID.randomUUID().toString();
     @NotBlank(message = "config_key must not be empty")
     private String config_key;
     @NotBlank(message = "config_value must not be empty")
     private String config_value;
 
+    @Column(name = "archived", nullable = false)
     private Boolean archived = false;
+
+    @Column(name = "created_on")
+    private LocalDateTime created_on = LocalDateTime.now();
+    @Column(name = "last_updated_by")
+    private String last_updated_by;
+
+    @Column(name = "last_updated_on")
+    private LocalDateTime lastUpdatedOn;
+
 
     public Configurations(){}
 
-    public Configurations(Long id, String config_key, String config_value, @NonNull Boolean is_archived) {
+    public Configurations(String id, String config_key, String config_value, Boolean archived, LocalDateTime created_on, String last_updated_by, LocalDateTime lastUpdatedOn) {
         this.id = id;
         this.config_key = config_key;
         this.config_value = config_value;
-        this.archived = is_archived;
+        this.archived = archived;
+        this.created_on = created_on;
+        this.last_updated_by = last_updated_by;
+        this.lastUpdatedOn = lastUpdatedOn;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -62,5 +77,29 @@ public class Configurations {
 
     public void setConfig_value(@NonNull String config_value) {
         this.config_value = config_value;
+    }
+
+    public String getLast_updated_by() {
+        return last_updated_by;
+    }
+
+    public void setLast_updated_by(String last_updated_by) {
+        this.last_updated_by = last_updated_by;
+    }
+
+    public LocalDateTime getLastUpdatedOn() {
+        return lastUpdatedOn;
+    }
+
+    public void setLastUpdatedOn(LocalDateTime lastUpdatedOn) {
+        this.lastUpdatedOn = lastUpdatedOn;
+    }
+
+    public LocalDateTime getCreated_on() {
+        return created_on;
+    }
+
+    public void setCreated_on(LocalDateTime created_on) {
+        this.created_on = created_on;
     }
 }
